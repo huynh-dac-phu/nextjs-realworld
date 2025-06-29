@@ -8,7 +8,7 @@ export const databaseProviders = [
       const dataSource = new DataSource({
         type: 'sqlite',
         name: 'realworld',
-        database: '../../realworld.sqlite',
+        database: config.get('DATABASE_PATH') || 'realworld.sqlite',
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: config.get('DEVELOPMENT') === 'DEVELOPMENT',
       });
