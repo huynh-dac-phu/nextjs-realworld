@@ -1,18 +1,32 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ResourceNotFoundException } from '@/common/exceptions/app.exception';
+import { ResourceNotFoundException } from '@/common/exceptions/error.exception';
+import { PaginationResponse } from '@/interfaces/pagination.interface';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  private async findAll(): Promise<{ message: string; data: User[] }> {
+  private async findAll(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<{
+    message: string;
+    data: PaginationResponse<User>;
+  }> {
+    const { data, pagination } = await this.userService.findAll({
+      page: +page,
+      limit: +limit,
+    });
     return {
       message: 'success',
-      data: await this.userService.findAll(),
+      data: {
+        data,
+        pagination,
+      },
     };
   }
 

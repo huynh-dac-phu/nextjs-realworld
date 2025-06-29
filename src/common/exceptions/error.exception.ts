@@ -1,36 +1,38 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Request, Response } from 'express';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
-@Catch()
-export class ErrorException implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    const config = new ConfigService();
-    const ctx = host.switchToHttp();
-    const res = ctx.getResponse<Response>();
-    const req = ctx.getRequest<Request>();
+export class AppException extends HttpException {
+  constructor(
+    message: string,
+    statusCode: number,
+    public readonly messageCode?: string,
+    public readonly details?: any,
+  ) {
+    super(
+      {
+        message,
+        messageCode,
+        details,
+      },
+      statusCode,
+    );
+  }
+}
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+export class ValidationException extends AppException {
+  constructor(message: string, details?: any) {
+    super(message, HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', details);
+  }
+}
 
-    const message =
-      exception instanceof HttpException ? exception.getResponse() : '';
+export class ResourceNotFoundException extends AppException {
+  constructor(resourceType: string, identifier: string | number) {
+    const message = `${resourceType} with ID ${identifier} not found`;
+    super(message, HttpStatus.NOT_FOUND, 'RESOURCE_NOT_FOUND');
+  }
+}
 
-    res.status(status).json({
-      statusCode: status,
-      timestamp: new Date().toISOString(),
-      ...(config.get('DEVELOPMENT') === 'DEVELOPMENT' && {
-        path: req.url,
-      }),
-      errorDetails: message,
-    });
+export class AuthenticationException extends AppException {
+  constructor(message: string = 'Authentication failed!') {
+    super(message, HttpStatus.UNAUTHORIZED, 'AUTHENTICATION_FAILED');
   }
 }
