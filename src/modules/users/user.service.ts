@@ -5,8 +5,9 @@ import { USER_REPOSITORY } from '@/constants/repositories';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Put, Patch, Delete } from '@nestjs/common';
-import { PaginationDto } from '@/common/dtos/pagination.dto';
 import { PaginationResponse } from '@/interfaces/pagination.interface';
+import { PaginationService } from '@/modules/pagination/pagination.service';
+import { PaginationDto } from '@/modules/pagination/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -14,32 +15,11 @@ export class UserService {
     @Inject(USER_REPOSITORY)
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private readonly paginationService: PaginationService,
   ) {}
 
   async findAll(params: PaginationDto): Promise<PaginationResponse<User>> {
-    const { page, limit } = params;
-    const users = await this.userRepository.find({
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    const total_page = Math.ceil(users.length / limit);
-
-    const has_prev = page > total_page;
-    const has_next = end < users.length;
-
-    return {
-      data: users.slice(start, end),
-      pagination: {
-        total: users.length,
-        page,
-        total_page,
-        limit,
-        has_prev,
-        has_next,
-      },
-    };
+    return this.paginationService.paginate<User>(this.userRepository, params);
   }
 
   async create(userDto: CreateUserDto) {

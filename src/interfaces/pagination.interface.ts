@@ -1,13 +1,24 @@
+import { SortDirection } from '@/types/sort.type';
+
 export interface PaginationMeta {
   total: number;
   page: number;
-  total_page: number;
+  totalPages: number;
   limit: number;
-  has_prev: boolean;
-  has_next: boolean;
+  hasPrev: boolean;
+  hasNext: boolean;
 }
 
 export interface PaginationResponse<T> {
   data: T[];
   pagination: PaginationMeta;
+}
+
+export interface PaginationOptions {
+  page: number;
+  limit: number;
+  orderBy?: string;
+  orderDirection?: SortDirection;
+  relations?: string[];
+  where?: any;
 }
