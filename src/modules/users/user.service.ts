@@ -8,6 +8,7 @@ import { Put, Patch, Delete } from '@nestjs/common';
 import { PaginationResponse } from '@/interfaces/pagination.interface';
 import { PaginationService } from '@/modules/pagination/pagination.service';
 import { PaginationDto } from '@/modules/pagination/pagination.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -24,23 +25,40 @@ export class UserService {
 
   async create(userDto: CreateUserDto) {
     const user = this.userRepository.create({
-      name: userDto.name,
-      age: userDto.age,
+      first_name: userDto.firstName,
+      last_name: userDto.lastName,
+      user_name: userDto.userName,
+      email: userDto.email,
+      password: userDto.password,
     });
     return this.userRepository.save(user);
   }
 
-  async findOne(id: string): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { id: Number(id) } });
   }
 
+  async findOne(condition): Promise<User | null> {
+    return this.userRepository.findOne({ where: condition });
+  }
+
   @Put(':id')
+  async updateUser(updateUserDto: UpdateUserDto): Promise<void> {
+    await this.userRepository.updateAll(updateUserDto);
+  }
+
   @Patch(':id')
   @Delete(':id')
   async delete(id: string): Promise<void> {
-    const user = await this.findOne(id);
+    const user = await this.findById(id);
     if (user) {
       await this.userRepository.remove(user);
     }
+  }
+
+  async setCurrentRefreshToken(userId: string, refreshToken: string) {
+    await this.userRepository.update(userId, {
+      refresh_token: refreshToken,
+    });
   }
 }

@@ -9,5 +9,6 @@ import { PaginationService } from '../pagination/pagination.service';
   imports: [DatabaseModule],
   providers: [...userProviders, UserService, PaginationService],
   controllers: [UserController],
+  exports: [UserService],
 })
 export class UserModule {}
