@@ -11,6 +11,7 @@ import { User } from '@/modules/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './interfaces/token.interface';
 import { ConfigService } from '@nestjs/config';
+import { AuthenticationException } from '@/common/exceptions/error.exception';
 
 @Injectable()
 export class AuthService {
@@ -77,7 +78,7 @@ export class AuthService {
       await this.verifyPlanContentWithHashedContent(password, user.password);
       return user;
     } catch (error) {
-      throw new UnauthorizedException(error);
+      throw new AuthenticationException(error);
     }
   }
 
@@ -87,7 +88,7 @@ export class AuthService {
   ) {
     const isMatching = await compare(planText, hashedText);
     if (!isMatching) {
-      throw new UnauthorizedException('Password is incorrect');
+      throw new AuthenticationException('Password is incorrect');
     }
   }
 

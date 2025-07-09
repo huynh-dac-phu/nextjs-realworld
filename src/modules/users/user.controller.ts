@@ -1,12 +1,23 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ResourceNotFoundException } from '@/common/exceptions/error.exception';
 import { PaginationMeta } from '@/interfaces/pagination.interface';
 import { PaginationDto } from '@/modules/pagination/pagination.dto';
+import { JwtAccessTokenGuard } from '@/modules/auth/guards/jwt-access-token.guard';
+import { Public } from '../auth/decorators/auth.decorators';
 
 @Controller('users')
+@UseGuards(JwtAccessTokenGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -34,10 +45,12 @@ export class UserController {
   }
 
   @Get(':id')
+  @Public()
   async detail(
     @Param('id') id: string,
   ): Promise<{ message: string; data: User }> {
-    const user = await this.userService.findOne(id);
+    const user = await this.userService.findOne({ id });
+    console.log(user);
     if (!user) {
       throw new ResourceNotFoundException('User', id);
     }
