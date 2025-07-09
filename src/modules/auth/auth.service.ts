@@ -37,6 +37,7 @@ export class AuthService {
         )}`,
         password: hashedPassword,
         bio: '',
+        role: 2,
         avatar: '',
         accessToken: '',
         refreshToken: '',
@@ -120,6 +121,7 @@ export class AuthService {
         )}s`,
       });
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }

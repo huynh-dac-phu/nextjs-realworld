@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -15,6 +16,7 @@ import { PaginationMeta } from '@/interfaces/pagination.interface';
 import { PaginationDto } from '@/modules/pagination/pagination.dto';
 import { JwtAccessTokenGuard } from '@/modules/auth/guards/jwt-access-token.guard';
 import { Public } from '../auth/decorators/auth.decorators';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('users')
 @UseGuards(JwtAccessTokenGuard)
@@ -39,6 +41,7 @@ export class UserController {
           email: user.email,
           bio: user.bio,
           image: user.avatar,
+          role: user.role,
         })),
         pagination,
       },
@@ -47,7 +50,12 @@ export class UserController {
 
   @Post()
   create(@Body() userDto: CreateUserDto) {
-    return this.userService.create(userDto);
+    try {
+      return this.userService.create(userDto);
+    } catch (error) {
+      console.log(error);
+      // throw new ValidationException(error);
+    }
   }
 
   @Get(':id')
@@ -63,5 +71,12 @@ export class UserController {
       message: 'success',
       data: user,
     };
+  }
+
+  @Delete(':id')
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAccessTokenGuard)
+  async delete(@Param('id') id: string) {
+    return await this.userService.delete(id);
   }
 }

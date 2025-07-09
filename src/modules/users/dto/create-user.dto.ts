@@ -1,3 +1,4 @@
+import { UserRole } from '@/modules/user-role/entities/user-role.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -7,6 +8,7 @@ import {
   IsEmail,
   IsStrongPassword,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -45,6 +47,10 @@ export class CreateUserDto {
   @Type(() => String)
   @MaxLength(255)
   avatar: string = '';
+
+  @IsNotEmpty()
+  @Type(() => Number)
+  role: number;
 
   @IsOptional()
   @Type(() => String)

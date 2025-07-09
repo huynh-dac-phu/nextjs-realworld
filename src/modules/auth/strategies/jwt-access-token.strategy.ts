@@ -21,6 +21,6 @@ export class JwtAccessTokenStrategy extends PassportStrategy(
   }
 
   async validate(payload: TokenPayload) {
-    return await this.userService.findOne({ id: Number(payload.userId) });
+    return await this.userService.getUserWithRole(Number(payload.userId));
   }
 }

@@ -4,11 +4,11 @@ import { User } from './entities/user.entity';
 import { USER_REPOSITORY } from '@/constants/repositories';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Put, Patch, Delete } from '@nestjs/common';
 import { PaginationResponse } from '@/interfaces/pagination.interface';
 import { PaginationService } from '@/modules/pagination/pagination.service';
 import { PaginationDto } from '@/modules/pagination/pagination.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ValidationException } from '@/common/exceptions/error.exception';
 
 @Injectable()
 export class UserService {
@@ -24,14 +24,20 @@ export class UserService {
   }
 
   async create(userDto: CreateUserDto) {
-    const user = this.userRepository.create({
-      first_name: userDto.firstName,
-      last_name: userDto.lastName,
-      user_name: userDto.userName,
-      email: userDto.email,
-      password: userDto.password,
-    });
-    return this.userRepository.save(user);
+    try {
+      const user = this.userRepository.create({
+        first_name: userDto.firstName,
+        last_name: userDto.lastName,
+        user_name: userDto.userName,
+        email: userDto.email,
+        password: userDto.password,
+        role: { id: userDto.role },
+      });
+      return this.userRepository.save(user);
+    } catch (error) {
+      console.log(error);
+      throw new ValidationException(error);
+    }
   }
 
   async findById(id: string): Promise<User | null> {
@@ -42,18 +48,25 @@ export class UserService {
     return this.userRepository.findOne({ where: condition });
   }
 
-  @Put(':id')
   async updateUser(updateUserDto: UpdateUserDto): Promise<void> {
-    await this.userRepository.updateAll(updateUserDto);
+    await this.userRepository.update(updateUserDto.id, {
+      ...updateUserDto,
+      role: { id: updateUserDto.role },
+    });
   }
 
-  @Patch(':id')
-  @Delete(':id')
-  async delete(id: string): Promise<void> {
-    const user = await this.findById(id);
-    if (user) {
-      await this.userRepository.remove(user);
-    }
+  async delete(id: string) {
+    return await this.userRepository.delete(id);
+  }
+
+  async getUserWithRole(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: {
+        role: true,
+      },
+    });
+    return { ...user, role: user?.role?.name };
   }
 
   async setCurrentRefreshToken(userId: string, refreshToken: string) {
