@@ -46,6 +46,10 @@ export class CreateUserDto {
   @MaxLength(255)
   avatar: string = '';
 
+  @IsNotEmpty()
+  @Type(() => Number)
+  role: number;
+
   @IsOptional()
   @Type(() => String)
   @MaxLength(255)

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -10,18 +11,24 @@ import {
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ResourceNotFoundException } from '@/common/exceptions/error.exception';
+import {
+  ResourceNotFoundException,
+  ValidationException,
+} from '@/common/exceptions/error.exception';
 import { PaginationMeta } from '@/interfaces/pagination.interface';
 import { PaginationDto } from '@/modules/pagination/pagination.dto';
 import { JwtAccessTokenGuard } from '@/modules/auth/guards/jwt-access-token.guard';
-import { Public } from '../auth/decorators/auth.decorators';
+import { Public } from '@/modules/auth/decorators/auth.decorators';
+import { RolesGuard } from '@/modules/auth/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorators';
+import { USER_ROLE } from '@/modules/user-role/entities/user-role.entity';
 
 @Controller('users')
-@UseGuards(JwtAccessTokenGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
+  @UseGuards(JwtAccessTokenGuard)
   private async findAll(@Query() query: PaginationDto): Promise<{
     message: string;
     data: {
@@ -29,25 +36,35 @@ export class UserController {
       pagination: PaginationMeta;
     };
   }> {
-    const { data, pagination } = await this.userService.findAll(query);
-    return {
-      message: 'success',
-      data: {
-        data: data.map(user => ({
-          id: user.id,
-          name: user.user_name,
-          email: user.email,
-          bio: user.bio,
-          image: user.avatar,
-        })),
-        pagination,
-      },
-    };
+    try {
+      const { data, pagination } = await this.userService.findAll(query);
+      return {
+        message: 'success',
+        data: {
+          data: data.map(user => ({
+            id: user.id,
+            name: user.user_name,
+            email: user.email,
+            bio: user.bio,
+            image: user.avatar,
+            role: user.role,
+          })),
+          pagination,
+        },
+      };
+    } catch (error) {
+      throw new ValidationException(error);
+    }
   }
 
   @Post()
   create(@Body() userDto: CreateUserDto) {
-    return this.userService.create(userDto);
+    try {
+      return this.userService.create(userDto);
+    } catch (error) {
+      console.log(error);
+      // throw new ValidationException(error);
+    }
   }
 
   @Get(':id')
@@ -62,6 +79,17 @@ export class UserController {
     return {
       message: 'success',
       data: user,
+    };
+  }
+
+  @Delete(':id')
+  @Roles(USER_ROLE.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAccessTokenGuard)
+  async delete(@Param('id') id: string) {
+    await this.userService.delete(id);
+    return {
+      message: 'success',
     };
   }
 }

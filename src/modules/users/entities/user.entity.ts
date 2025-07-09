@@ -1,7 +1,10 @@
+import { UserRole } from '@/modules/user-role/entities/user-role.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -37,6 +40,12 @@ export class User {
   @Column({ length: 255 })
   refresh_token: string = '';
 
+  @ManyToOne(() => UserRole, userRole => userRole.name, { eager: false })
+  role: UserRole;
+
   @CreateDateColumn()
   created_at: Date;
+
+  @DeleteDateColumn()
+  delete_at?: Date;
 }
