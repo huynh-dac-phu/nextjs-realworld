@@ -25,7 +25,7 @@ export class UserController {
   private async findAll(@Query() query: PaginationDto): Promise<{
     message: string;
     data: {
-      data: User[];
+      data: Partial<User>[];
       pagination: PaginationMeta;
     };
   }> {
@@ -33,7 +33,13 @@ export class UserController {
     return {
       message: 'success',
       data: {
-        data,
+        data: data.map(user => ({
+          id: user.id,
+          name: user.user_name,
+          email: user.email,
+          bio: user.bio,
+          image: user.avatar,
+        })),
         pagination,
       },
     };
@@ -50,7 +56,6 @@ export class UserController {
     @Param('id') id: string,
   ): Promise<{ message: string; data: User }> {
     const user = await this.userService.findOne({ id });
-    console.log(user);
     if (!user) {
       throw new ResourceNotFoundException('User', id);
     }

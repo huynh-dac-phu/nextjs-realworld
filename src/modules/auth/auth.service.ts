@@ -3,7 +3,6 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from '@/modules/users/user.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -82,7 +81,26 @@ export class AuthService {
     }
   }
 
-  async verifyPlanContentWithHashedContent(
+  async getUserIfRefreshTokenMatched(
+    userId: string,
+    refreshToken: string,
+  ): Promise<User> {
+    try {
+      const user = await this.userService.findOne({ id: Number(userId) });
+      if (!user) {
+        throw new AuthenticationException('User not found');
+      }
+      await this.verifyPlanContentWithHashedContent(
+        refreshToken,
+        user.refresh_token,
+      );
+      return user;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  private async verifyPlanContentWithHashedContent(
     planText: string,
     hashedText: string,
   ) {
@@ -96,7 +114,7 @@ export class AuthService {
     try {
       return this.jwtService.sign(payload, {
         // algorithm: 'RS256',
-        secret: this.configService.get<string>('JWT_SCREET_KEY'),
+        secret: this.configService.get<string>('JWT_SCREET_ACCESS_KEY'),
         expiresIn: `${this.configService.get<string>(
           'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
         )}s`,
@@ -109,7 +127,7 @@ export class AuthService {
   generateRefreshToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
       // algorithm: 'RS256',
-      secret: this.configService.get<string>('JWT_SCREET_KEY'), // mustchang
+      secret: this.configService.get<string>('JWT_SCREET_REFRESH_KEY'), // mustchang
       expiresIn: `${this.configService.get<string>(
         'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
       )}s`,

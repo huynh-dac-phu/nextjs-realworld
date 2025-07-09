@@ -6,14 +6,17 @@ import { TokenPayload } from '@/modules/auth/interfaces/token.interface';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
+export class JwtAccessTokenStrategy extends PassportStrategy(
+  Strategy,
+  'refresh_token',
+) {
   constructor(private readonly userService: UserService) {
     const configService = new ConfigService();
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SCREET_KEY') || '',
+      secretOrKey: configService.get<string>('JWT_SCREET_ACCESS_KEY') || '',
     });
   }
 

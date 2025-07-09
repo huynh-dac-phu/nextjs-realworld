@@ -3,6 +3,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local.guard';
 import { User } from '@/modules/users/entities/user.entity';
+import { JwtRefreshTokenGuard } from './guards/jwt-refresh-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -13,13 +14,25 @@ export class AuthController {
     await this.authService.signUp(signUpDto);
   }
 
-  @Post('sign-in')
   @UseGuards(LocalAuthGuard)
+  @Post('sign-in')
   async signIn(@Req() req: { user: User }) {
     const { user } = req;
     const token = await this.authService.signIn(user.id.toString());
     return {
       data: token,
     };
+  }
+
+  @UseGuards(JwtRefreshTokenGuard)
+  @Post('refresh')
+  refreshAccessToken(@Req() req: { user: User }): {
+    data: { accessToken: string };
+  } {
+    const { user } = req;
+    const accessToken = this.authService.generateAccessToken({
+      userId: user.id.toString(),
+    });
+    return { data: { accessToken } };
   }
 }
