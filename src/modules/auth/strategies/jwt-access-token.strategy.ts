@@ -6,10 +6,7 @@ import { TokenPayload } from '@/modules/auth/interfaces/token.interface';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class JwtAccessTokenStrategy extends PassportStrategy(
-  Strategy,
-  'refresh_token',
-) {
+export class JwtAccessTokenStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly userService: UserService) {
     const configService = new ConfigService();
 
@@ -21,6 +18,6 @@ export class JwtAccessTokenStrategy extends PassportStrategy(
   }
 
   async validate(payload: TokenPayload) {
-    return await this.userService.findOne({ id: Number(payload.userId) });
+    return await this.userService.getUserWithRole(Number(payload.userId));
   }
 }

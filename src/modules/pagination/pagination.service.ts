@@ -22,6 +22,7 @@ export class PaginationService {
       relations: options.relations,
       where: options.where,
     });
+    console.log(data);
     const totalPages = Math.ceil(total / limit);
     const meta: PaginationMeta = {
       total,
