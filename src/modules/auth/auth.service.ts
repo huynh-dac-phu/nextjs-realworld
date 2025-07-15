@@ -11,6 +11,10 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './interfaces/token.interface';
 import { ConfigService } from '@nestjs/config';
 import { AuthenticationException } from '@/common/exceptions/error.exception';
+import {
+  accessTokenPrivateKey,
+  refreshTokenPrivateKey,
+} from '@/constraints/jwt.constraints';
 
 @Injectable()
 export class AuthService {
@@ -114,8 +118,9 @@ export class AuthService {
   generateAccessToken(payload: TokenPayload) {
     try {
       return this.jwtService.sign(payload, {
-        // algorithm: 'RS256',
-        secret: this.configService.get<string>('JWT_SCREET_ACCESS_KEY'),
+        algorithm: 'RS256',
+        privateKey: accessTokenPrivateKey,
+        // secret: this.configService.get<string>('JWT_SCREET_ACCESS_KEY'),
         expiresIn: `${this.configService.get<string>(
           'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
         )}s`,
@@ -128,8 +133,9 @@ export class AuthService {
 
   generateRefreshToken(payload: TokenPayload) {
     return this.jwtService.sign(payload, {
-      // algorithm: 'RS256',
-      secret: this.configService.get<string>('JWT_SCREET_REFRESH_KEY'), // mustchang
+      algorithm: 'RS256',
+      privateKey: refreshTokenPrivateKey,
+      // secret: this.configService.get<string>('JWT_SCREET_REFRESH_KEY'), // mustchang
       expiresIn: `${this.configService.get<string>(
         'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
       )}s`,
