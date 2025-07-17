@@ -1,9 +1,5 @@
 import { hash, compare } from 'bcrypt';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '@/modules/users/user.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { User } from '@/modules/users/entities/user.entity';
@@ -69,20 +65,19 @@ export class AuthService {
       await this.storeRefreshToken(userId, refreshToken);
       return { accessToken, refreshToken };
     } catch (error) {
-      throw new BadRequestException(error);
+      throw error;
     }
   }
 
   async getAuthenticatedUser(email: string, password: string): Promise<User> {
     try {
       const user = await this.userService.findOne({ email });
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
       await this.verifyPlanContentWithHashedContent(password, user.password);
       return user;
-    } catch (error) {
-      throw new AuthenticationException(error);
+    } catch {
+      throw new BadRequestException({
+        message: 'Wrong credentials!!',
+      });
     }
   }
 
@@ -92,16 +87,15 @@ export class AuthService {
   ): Promise<User> {
     try {
       const user = await this.userService.findOne({ id: Number(userId) });
-      if (!user) {
-        throw new AuthenticationException('User not found');
-      }
       await this.verifyPlanContentWithHashedContent(
         refreshToken,
         user.refresh_token,
       );
       return user;
-    } catch (error) {
-      throw new Error(error);
+    } catch {
+      throw new BadRequestException({
+        message: 'Wrong credentials!!',
+      });
     }
   }
 

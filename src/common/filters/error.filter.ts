@@ -30,7 +30,7 @@ export class ErrorException implements ExceptionFilter {
       ...(config.get('DEVELOPMENT') === 'DEVELOPMENT' && {
         path: req.url,
       }),
-      errorDetails: message,
+      details: message,
     });
   }
 }
