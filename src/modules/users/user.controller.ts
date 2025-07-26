@@ -1,16 +1,13 @@
 import {
-  Body,
   Controller,
   Delete,
   Get,
   Param,
-  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
 import {
   ResourceNotFoundException,
   ValidationException,
@@ -57,22 +54,12 @@ export class UserController {
     }
   }
 
-  @Post()
-  create(@Body() userDto: CreateUserDto) {
-    try {
-      return this.userService.create(userDto);
-    } catch (error) {
-      console.log(error);
-      // throw new ValidationException(error);
-    }
-  }
-
   @Get(':id')
   @Public()
   async detail(
     @Param('id') id: string,
   ): Promise<{ message: string; data: User }> {
-    const user = await this.userService.findOne({ id });
+    const user = await this.userService.findOne({ id: Number(id) });
     if (!user) {
       throw new ResourceNotFoundException('User', id);
     }

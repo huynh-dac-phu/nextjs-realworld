@@ -48,7 +48,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @Type(() => Number)
-  role: number;
+  role: number = 2;
 
   @IsOptional()
   @Type(() => String)

@@ -1,3 +1,4 @@
+import { UserFollow } from '@/modules/user-follow/entities/user-follow.entity';
 import { UserRole } from '@/modules/user-role/entities/user-role.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -42,6 +44,13 @@ export class User {
 
   @ManyToOne(() => UserRole, userRole => userRole.name, { eager: false })
   role: UserRole;
+
+  // Những người mà tôi follow
+  @OneToMany(() => UserFollow, follow => follow.follower)
+  following: UserFollow[];
+
+  @OneToMany(() => UserFollow, follow => follow.following)
+  followers: UserFollow[];
 
   @CreateDateColumn()
   created_at: Date;

@@ -23,14 +23,13 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto) {
     try {
-      const isExistEmail = await this.userService.findOne({
-        email: signUpDto.email,
-      });
+      const isExistEmail = await this.userService.findByEmail(signUpDto.email);
       if (isExistEmail) {
         throw new BadRequestException('Email is existed');
       }
+
       const hashedPassword = await hash(signUpDto.password, this.SALT_ROUND);
-      const newUser = await this.userService.create({
+      const newUser = await this.userService.createForAuth({
         ...signUpDto,
         userName: `${signUpDto.email.split('@')[0]}${Math.floor(
           10 + Math.random() * (999 - 10),
@@ -62,8 +61,16 @@ export class AuthService {
     try {
       const accessToken = this.generateAccessToken({ userId });
       const refreshToken = this.generateRefreshToken({ userId });
+      const user = await this.userService.findById(userId);
       await this.storeRefreshToken(userId, refreshToken);
-      return { accessToken, refreshToken };
+      return {
+        accessToken,
+        refreshToken,
+        email: user?.email,
+        username: user?.user_name,
+        bio: user?.bio,
+        image: user?.avatar,
+      };
     } catch (error) {
       throw error;
     }
@@ -120,7 +127,6 @@ export class AuthService {
         )}s`,
       });
     } catch (error) {
-      console.log(error);
       throw new Error(error);
     }
   }
