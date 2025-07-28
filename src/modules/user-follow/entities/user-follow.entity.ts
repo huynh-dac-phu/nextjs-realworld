@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 
 @Entity('user_follow')
-// @Unique(['follower_id', 'following_id'])
 export class UserFollow {
   @PrimaryColumn({ name: 'follower_id' })
   follower_id: number;

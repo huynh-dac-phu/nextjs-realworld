@@ -45,7 +45,6 @@ export class User {
   @ManyToOne(() => UserRole, userRole => userRole.name, { eager: false })
   role: UserRole;
 
-  // Những người mà tôi follow
   @OneToMany(() => UserFollow, follow => follow.follower)
   following: UserFollow[];
 

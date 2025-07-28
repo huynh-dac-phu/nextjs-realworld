@@ -5,6 +5,7 @@ import { DatabaseModule } from '@/database/database.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { ProfileModule } from '@/modules/profile/profile.module';
 import { FollowModule } from '@/modules/user-follow/user-follow.module';
+import { ArticleModule } from '@/modules/article/article.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,6 +15,7 @@ import { FollowModule } from '@/modules/user-follow/user-follow.module';
     UserModule,
     ProfileModule,
     FollowModule,
+    ArticleModule,
     AuthModule,
   ],
 })

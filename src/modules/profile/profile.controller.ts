@@ -85,8 +85,6 @@ export class ProfileController {
       user_name: username,
     });
 
-    console.log({ followerUser, followingUser });
-
     if (!followingUser) {
       throw new NotFoundException('User not found');
     }
