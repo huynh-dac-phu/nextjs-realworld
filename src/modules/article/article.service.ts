@@ -26,6 +26,15 @@ export class ArticleService {
     }
   }
 
+  async getArticleBySlug(slug: string): Promise<Article | null | undefined> {
+    try {
+      const article = await this.articleRepository.findOneBy({ slug });
+      return article;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async createArticle(userId: number, articleDto: CreateArticleDto) {
     try {
       console.log({ userId });

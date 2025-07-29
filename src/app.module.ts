@@ -6,6 +6,7 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { ProfileModule } from '@/modules/profile/profile.module';
 import { FollowModule } from '@/modules/user-follow/user-follow.module';
 import { ArticleModule } from '@/modules/article/article.module';
+import { FavoriteModule } from '@/modules/favorite/favorite.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,6 +17,7 @@ import { ArticleModule } from '@/modules/article/article.module';
     ProfileModule,
     FollowModule,
     ArticleModule,
+    FavoriteModule,
     AuthModule,
   ],
 })

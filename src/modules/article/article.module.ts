@@ -5,9 +5,10 @@ import { articleProviders } from './article.provider';
 import { DatabaseModule } from '@/database/database.module';
 import { UserModule } from '../users/user.module';
 import { FollowModule } from '../user-follow/user-follow.module';
+import { FavoriteModule } from '../favorite/favorite.module';
 
 @Module({
-  imports: [DatabaseModule, UserModule, FollowModule],
+  imports: [DatabaseModule, UserModule, FollowModule, FavoriteModule],
   providers: [...articleProviders, ArticleService],
   controllers: [ArticleController],
   exports: [ArticleService],
