@@ -24,6 +24,12 @@ export class FollowService {
     return follow;
   }
 
+  async getFollowers(currnetUserId: number): Promise<UserFollow[]> {
+    return await this.userFollowRepository.find({
+      where: { follower_id: currnetUserId },
+    });
+  }
+
   followUser(followDto: FollowDto) {
     const follow = this.userFollowRepository.create({
       follower_id: followDto.follower_id,

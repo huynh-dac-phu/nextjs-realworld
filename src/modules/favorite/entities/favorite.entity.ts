@@ -1,8 +1,12 @@
+import { Article } from '@/modules/article/entities/article.entity';
+import { IsNotEmpty } from 'class-validator';
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  PrimaryColumn,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -11,13 +15,20 @@ export class Favorite {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({ name: 'user_id' })
+  @Column()
+  @IsNotEmpty()
   user_id: number;
 
-  @PrimaryColumn({ name: 'article_id' })
+  @Column()
+  @IsNotEmpty()
   article_id: number;
 
+  @ManyToOne(() => Article, article => article.favorites)
+  @JoinColumn({ name: 'article_id' })
+  article: Article;
+
   @CreateDateColumn()
+  @IsNotEmpty()
   created_at: Date;
 
   @DeleteDateColumn()

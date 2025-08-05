@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateArticleDto {
   @IsNotEmpty()
@@ -15,5 +15,7 @@ export class CreateArticleDto {
   @IsString()
   @MaxLength(5000)
   body: string;
-  // tagList?: string[];
+
+  @IsOptional()
+  tagList: string[];
 }
