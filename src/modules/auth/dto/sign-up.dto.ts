@@ -26,3 +26,7 @@ export class SignUpDto {
   @IsStrongPassword()
   password: string;
 }
+
+export class SignUpBody {
+  user: SignUpDto;
+}

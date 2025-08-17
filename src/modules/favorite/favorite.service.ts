@@ -27,10 +27,10 @@ export class FavoriteService {
     }
   }
 
-  async deleteFavorite(articleId: number) {
+  async deleteFavorite(userId: number, articleId: number) {
     try {
       const favorite = await this.favoriteRepository.findOne({
-        where: { article_id: articleId },
+        where: { article_id: articleId, user_id: userId },
       });
       if (!favorite) {
         throw new NotFoundException('Favorite not found');

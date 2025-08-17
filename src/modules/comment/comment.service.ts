@@ -76,4 +76,19 @@ export class CommentService {
       console.log(error);
     }
   }
+
+  async getCommentById(commentId: number) {
+    try {
+      const comment = await this.commentRepository.findOne({
+        where: { id: commentId },
+        relations: ['author'],
+      });
+      if (!comment) {
+        throw new NotFoundException('Comment not found');
+      }
+      return comment;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

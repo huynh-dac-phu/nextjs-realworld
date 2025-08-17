@@ -12,7 +12,7 @@ export class ProfileService {
     private userRepository: Repository<User>,
   ) {}
 
-  async getProfile(user_name: string) {
+  async getProfile(user_name: string): Promise<User | undefined> {
     try {
       const userProfile = await this.userRepository.findOne({
         where: { user_name },

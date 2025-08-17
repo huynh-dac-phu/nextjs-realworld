@@ -12,6 +12,7 @@ import {
   ResourceNotFoundException,
   ValidationException,
 } from '@/common/exceptions/error.exception';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 @Injectable()
 export class UserService {
@@ -30,7 +31,7 @@ export class UserService {
     }
   }
 
-  async create(userDto: CreateUserDto) {
+  async create(userDto: RegisterUserDto) {
     const isExistEmail = await this.findByEmail(userDto.email);
     if (isExistEmail) throw 'Email is existed';
 
@@ -40,7 +41,7 @@ export class UserService {
       user_name: userDto.userName,
       email: userDto.email,
       password: userDto.password,
-      role: { id: userDto.role },
+      role: { id: 2 }, // Default role is USER
     });
 
     const userCreated = await this.userRepository.save(user);
@@ -66,7 +67,7 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: Number(id) },
     });

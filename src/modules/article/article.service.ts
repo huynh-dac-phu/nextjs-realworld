@@ -26,15 +26,19 @@ export class ArticleService {
     }
   }
 
-  async getArticleBySlug(slug: string): Promise<Article | null | undefined> {
+  async getArticleBySlug(slug: string): Promise<Article> {
     try {
       const article = await this.articleRepository.findOne({
         where: { slug },
         relations: ['author', 'favorites'],
       });
+      if (!article) {
+        throw new NotFoundException(`Article with slug ${slug} not found`);
+      }
       return article;
     } catch (error) {
       console.log(error);
+      throw error;
     }
   }
 
@@ -51,6 +55,7 @@ export class ArticleService {
       return await this.articleRepository.save(article);
     } catch (error) {
       console.log(error);
+      throw error;
     }
   }
 

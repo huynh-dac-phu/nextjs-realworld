@@ -1,5 +1,6 @@
 import { UserFollow } from '@/modules/user-follow/entities/user-follow.entity';
 import { UserRole } from '@/modules/user-role/entities/user-role.entity';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -15,9 +16,11 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({ example: 'john_doe', description: 'The user name of user' })
   @Column({ length: 50 })
   user_name: string;
 
+  @ApiProperty({ example: 'john@example.com', description: 'The user email' })
   @Column({ length: 50 })
   email: string;
 

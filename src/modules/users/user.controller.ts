@@ -19,7 +19,9 @@ import { Public } from '@/modules/auth/decorators/auth.decorators';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorators';
 import { USER_ROLE } from '@/modules/user-role/entities/user-role.entity';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
