@@ -1,4 +1,6 @@
+import { Favorite } from '@/modules/favorite/entities/favorite.entity';
 import { User } from '@/modules/users/entities/user.entity';
+import { IsNotEmpty } from 'class-validator';
 import slugify from 'slugify';
 import {
   BeforeInsert,
@@ -9,7 +11,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryColumn,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -31,12 +33,16 @@ export class Article {
   @Column()
   body: string;
 
-  @PrimaryColumn({ name: 'user_id' })
+  @Column()
+  @IsNotEmpty()
   user_id: number;
 
   @ManyToOne(() => User, user => user, { eager: false })
   @JoinColumn({ name: 'user_id' })
   author: User;
+
+  @OneToMany(() => Favorite, favorite => favorite.article)
+  favorites: Favorite[];
 
   @CreateDateColumn()
   created_at: Date;
@@ -46,6 +52,9 @@ export class Article {
 
   @DeleteDateColumn()
   delete_at: Date;
+
+  @Column('simple-array', { nullable: true })
+  tagList: string[];
 
   @BeforeInsert()
   @BeforeUpdate()
